@@ -22,7 +22,6 @@ export class HomePage {
     readonly destinationField: Locator;
     readonly destinationRemoveButton: Locator;
     readonly destinationInput: Locator;
-    readonly destinationSuggestions: Locator;
 
     //Travellers control variable
     readonly travellersControl: Locator;
@@ -66,7 +65,7 @@ export class HomePage {
         });
         this.tripTypeOptions = page.locator('[id="flight-trip-type-dropdown"]');
 
-        //Destinantion and Origin Locators
+        //Destination and Origin Locators
         this.originField = page.locator('[aria-label="Flight origin input"]');
         this.destinationField = page.locator('[aria-label="Flight destination input"]');
         this.originRemoveButton = this.originField.getByRole('button', {
@@ -80,13 +79,12 @@ export class HomePage {
         this.originInput = page.locator('input[role="combobox"][aria-controls="flight-origin-smarty-input-list"]');
         this.destinationInput = page.locator('input[data-test-destination]');
         this.originSuggestions = page.locator('[id="flight-origin-smarty-input-list"]');
-        this.destinationSuggestions = page.locator('[id="flight-destination-smarty-input-list"]');
 
         //Date calendar locators
         this.combinedDatesButton = this.destinationField.getByRole('button', {
             name: 'Departure - Return',
             exact: true
-        })
+        });
         this.departureCalendar = page.locator('div[aria-label="Departure date"]').filter({has: page.getByRole('grid')});
         this.departureDateButton = page.getByRole('button', {
             name: 'Departure date',
@@ -135,14 +133,6 @@ export class HomePage {
         });
     }
 
-    //Method to return an airport suggestion locator by accessible name for destination
-    destinationOption(name: string): Locator {
-        return this.destinationSuggestions.getByRole('option', {
-            name,
-            exact: true
-        });
-    }
-
     //Method to return the locator of whichever trip type we use in the test
     tripTypeOption(name: string): Locator {
         return this.tripTypeOptions.getByRole('option', {
@@ -169,7 +159,7 @@ export class HomePage {
         const format = (date: Date): string => date.toLocaleDateString('en-GB', {
             day: 'numeric',
             month: 'short'
-        })
+        });
 
         return this.destinationField.getByRole('button', {
             name: `${format(departure)} - ${format(returnDate)}`,
@@ -241,32 +231,32 @@ export class HomePage {
 
     //Method to submit Flight search
     async submitSearch(): Promise<Page> {
-    const context = this.page.context();
+        const context = this.page.context();
 
-    await this.searchButton.click();
+        await this.searchButton.click();
 
-    await expect.poll(() => {
-        return context.pages().some(tab =>
-            tab.url().startsWith(
-                'https://www.cheapflights.com.au/flight-search/'
-            )
-        );
-        }, {
-            timeout: 15_000,
-            message: 'Cheapflights results should open in a browser tab',
-        }).toBe(true);
+        await expect.poll(() => {
+            return context.pages().some(tab =>
+                tab.url().startsWith(
+                    'https://www.cheapflights.com.au/flight-search/'
+                )
+            );
+            }, {
+                timeout: 15_000,
+                message: 'Cheapflights results should open in a browser tab',
+            }).toBe(true);
 
-        const resultsTab = context.pages().find(tab =>
-            tab.url().startsWith(
-                'https://www.cheapflights.com.au/flight-search/'
-            )
-        );
+            const resultsTab = context.pages().find(tab =>
+                tab.url().startsWith(
+                    'https://www.cheapflights.com.au/flight-search/'
+                )
+            );
 
-        if (!resultsTab) {
-            throw new Error('Cheapflights results tab was not found');
-        }
+            if (!resultsTab) {
+                throw new Error('Cheapflights results tab was not found');
+            }
 
-        return resultsTab;
+            return resultsTab;
     }
 
     //Method to click search

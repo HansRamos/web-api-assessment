@@ -13,7 +13,7 @@ test.describe('Flight Search', () => {
     const returnDate = new Date(departureDate);
     returnDate.setDate(returnDate.getDate() + 7);
 
-    //Setting up window size for element location test
+    //Use a consistent desktop viewport
     test.use({
         viewport: {width: 1280, height: 720},
     });
