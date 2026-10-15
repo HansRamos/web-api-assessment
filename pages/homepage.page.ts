@@ -35,6 +35,7 @@ export class HomePage {
     readonly departureDateButton: Locator;
     readonly returnDateButton: Locator;
     readonly nextMonthButton: Locator;
+    readonly combinedDatesButton: Locator;
 
     //Checkboxes
     readonly palComparisonCheckbox: Locator;
@@ -63,65 +64,63 @@ export class HomePage {
         this.tripTypeSelector = page.getByRole('combobox', {
             name: /^Trip type /,
         });
-
         this.tripTypeOptions = page.locator('[id="flight-trip-type-dropdown"]');
 
+        //Destinantion and Origin Locators
         this.originField = page.locator('[aria-label="Flight origin input"]');
-
         this.destinationField = page.locator('[aria-label="Flight destination input"]');
-
         this.originRemoveButton = this.originField.getByRole('button', {
             name: 'Remove value',
             exact: true
         });
-
         this.destinationRemoveButton = this.destinationField.getByRole('button', {
             name: 'Remove value',
             exact: true
         });
-
         this.originInput = page.locator('input[role="combobox"][aria-controls="flight-origin-smarty-input-list"]');
-
         this.destinationInput = page.locator('input[data-test-destination]');
-
         this.originSuggestions = page.locator('[id="flight-origin-smarty-input-list"]');
-
         this.destinationSuggestions = page.locator('[id="flight-destination-smarty-input-list"]');
 
+        //Date calendar locators
+        this.combinedDatesButton = this.destinationField.getByRole('button', {
+            name: 'Departure - Return',
+            exact: true
+        })
         this.departureCalendar = page.locator('div[aria-label="Departure date"]').filter({has: page.getByRole('grid')});
-
         this.departureDateButton = page.getByRole('button', {
             name: 'Departure date',
             exact: true
         });
-
         this.returnDateButton = page.getByRole('button', {
             name: 'Return date',
             exact: true
         });
-
         this.nextMonthButton = page.getByRole('button', {
             name: 'Next month',
             exact: true
         });
 
+        //Travellers Control Locator
         this.travellersControl = page.locator('[id="ffd-traveler-type-handle"]');
 
+        //Search Button Locator
         this.searchButton = page.getByRole('button', {
             name: 'Search',
             exact: true
         });
 
+        //Checkbox Locators
         this.palComparisonCheckbox = page.getByRole('checkbox', {
             name: 'Philippine Airlines',
             exact: true
         });
-                
         this.directFlightsCheckbox = page.getByRole('checkbox', {
             name: 'Direct flights only',
             exact: true
         });
 
+        //Missing Airport Modal Locator
         this.missingAirportModal = page.getByRole('dialog').getByText("You didn't select an airport");
 
     }
@@ -154,14 +153,14 @@ export class HomePage {
 
     //Method to return the locator of a selected date in the date picker
     dateOption(date: Date): Locator {
-        const label = date.toLocaleDateString('en-US', {
+        const month = date.toLocaleDateString('en-US', {
             month: 'long',
-            day: 'numeric',
-            year: 'numeric'
-        }).replace(',','');
+        });
+        const day = date.getDate();
+        const year = date.getFullYear();
 
         return this.page.getByRole('button', {
-            name: new RegExp(`^${label}(?:\\s|$)`)
+            name: new RegExp(`^(?:${month} ${day} ${year}|${day} ${month}, ${year})`)
         });
     }
 
@@ -223,8 +222,12 @@ export class HomePage {
     //Method to select travel dates
     async selectTravelDates(departureDate: Date, returnDate: Date): Promise<void>{
         if(!(await this.departureCalendar.isVisible())){
-            await this.departureDateButton.click();
-        }
+            if(await this.combinedDatesButton.isVisible()){
+                await this.combinedDatesButton.click();
+            }else{
+                await this.departureDateButton.click();
+            }
+        };
         await this.dateOption(departureDate).click();
         await this.dateOption(returnDate).click();
     };
