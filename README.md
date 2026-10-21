@@ -18,3 +18,6 @@ Coverage:
     Return-flight search, result information, and missing-destination validation.
     Positive and negative booking creation, retrieval, update, and deletion.
     API response fields and verification of persisted or unchanged data.
+
+Test report:
+https://web-api-test-report.pages.dev/
