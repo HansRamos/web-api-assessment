@@ -46,3 +46,16 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
+
+      - name: Generate Allure report
+        id: allure_report
+        if: ${{ !cancelled() }}
+        run: npx allure generate allure-results --output allure-report
+
+      - name: Deploy Allure report to Cloudflare
+        if: ${{ !cancelled() && steps.allure_report.outcome == 'success' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy allure-report --project-name=web-api-test-report --branch=main
