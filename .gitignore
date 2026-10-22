@@ -9,3 +9,4 @@ node_modules/
 /diagnostic-results*/
 /allure-results/
 /allure-report/
+/allure-history.jsonl
